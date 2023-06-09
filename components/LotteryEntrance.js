@@ -11,6 +11,7 @@ export default function LotteryEntrance() {
     const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const [entranceFee, setEntranceFee] = useState("0")
     const [numberOfPlayers, setNumberOfPlayers] = useState("0")
+    const [remainingTime, setRemainingTime] = useState("0")
     const [recentWinner, setRecentWinner] = useState("0")
 
     const dispatch = useNotification()
@@ -41,6 +42,13 @@ export default function LotteryEntrance() {
         param: {},
     })
 
+    const { runContractFunction: getInterval } = useWeb3Contract({
+        abi: abi,
+        contractAddress: raffleAddress, // specify the networkId
+        functionName: "getInterval",
+        param: {},
+    })
+
     const { runContractFunction: getRecentWinner } = useWeb3Contract({
         abi: abi,
         contractAddress: raffleAddress, // specify the networkId
@@ -52,8 +60,10 @@ export default function LotteryEntrance() {
         const entranceFeeFromCall = (await getEntranceFee()).toString()
         const numPlayersFromcall = (await getNumberOfPlayers()).toString()
         const recentWinnerFromCall = await getRecentWinner()
+        const remainingTimeFromCall = (await getInterval()).toString()
         setEntranceFee(entranceFeeFromCall)
         setNumberOfPlayers(numPlayersFromcall)
+        setRemainingTime(remainingTimeFromCall)
         setRecentWinner(recentWinnerFromCall)
     }
 
@@ -120,6 +130,7 @@ export default function LotteryEntrance() {
                     </button>
                     <div>Entrance Fee: {ethers.utils.formatUnits(entranceFee, "ether")} ETH</div>
                     <div>The current number of players is: {numberOfPlayers}</div>
+                    <div>The remaining time is: {remainingTime}</div>
                     <div>The most previous winner was: {recentWinner}</div>
                 </div>
             ) : (
