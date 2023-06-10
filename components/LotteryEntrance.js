@@ -4,6 +4,7 @@ import { useMoralis } from "react-moralis"
 import { useEffect, useState } from "react"
 import { ethers } from "ethers"
 import { useNotification } from "web3uikit"
+import { CountdownCircleTimer } from "react-countdown-circle-timer"
 
 export default function LotteryEntrance() {
     const { chainId: chainIdHex, isWeb3Enabled, web3 } = useMoralis()
@@ -11,7 +12,7 @@ export default function LotteryEntrance() {
     const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const [entranceFee, setEntranceFee] = useState("0")
     const [numberOfPlayers, setNumberOfPlayers] = useState("0")
-    const [remainingTime, setRemainingTime] = useState("0")
+    const [timeLeft, setTimeLeft] = useState("0")
     const [recentWinner, setRecentWinner] = useState("0")
 
     const dispatch = useNotification()
@@ -60,10 +61,10 @@ export default function LotteryEntrance() {
         const entranceFeeFromCall = (await getEntranceFee()).toString()
         const numPlayersFromcall = (await getNumberOfPlayers()).toString()
         const recentWinnerFromCall = await getRecentWinner()
-        const remainingTimeFromCall = (await getInterval()).toString()
+        const timeLeftFromCall = await getInterval()
         setEntranceFee(entranceFeeFromCall)
         setNumberOfPlayers(numPlayersFromcall)
-        setRemainingTime(remainingTimeFromCall)
+        setTimeLeft(timeLeftFromCall)
         setRecentWinner(recentWinnerFromCall)
     }
 
@@ -106,12 +107,25 @@ export default function LotteryEntrance() {
             icon: "bell",
         })
     }
+    const renderTime = ({ remainingTime }) => {
+        if (remainingTime === 0) {
+            return <div className="flex flex-col items-center">TIME'S UP!</div>
+        }
+
+        return (
+            <div className="flex flex-col items-center">
+                <div className="text-gray-500">Remaining</div>
+                <div className="text-4xl">{remainingTime}</div>
+                <div className="text-gray-500">seconds</div>
+            </div>
+        )
+    }
 
     return (
         <div className="p-5">
-            Hi from Lottery Entrance!
             {raffleAddress ? (
                 <div>
+                    <div className="p-3 border-t-2 flex flex-row"></div>
                     <button
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-auto"
                         onClick={async function () {
@@ -130,8 +144,21 @@ export default function LotteryEntrance() {
                     </button>
                     <div>Entrance Fee: {ethers.utils.formatUnits(entranceFee, "ether")} ETH</div>
                     <div>The current number of players is: {numberOfPlayers}</div>
-                    <div>The remaining time is: {remainingTime}</div>
-                    <div>The most previous winner was: {recentWinner}</div>
+                    <div className="p-3 border-b-2 flex flex-row"></div>
+                    <div className="p-4">Time left:</div>
+                    <div className="flex justify-center py-2.5 my-2">
+                        <CountdownCircleTimer
+                            isPlaying
+                            duration={Number(timeLeft)}
+                            colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
+                            colorsTime={[timeLeft, (timeLeft * 2) / 3, (timeLeft * 1) / 3, 0]}
+                        >
+                            {renderTime}
+                        </CountdownCircleTimer>
+                    </div>
+                    <div className="flex justify-center py-4 px-4 font-bold text-2xl text-red-600">
+                        The most previous winner: {recentWinner}
+                    </div>
                 </div>
             ) : (
                 <div>Please connect to a supported chain</div>
