@@ -1,5 +1,9 @@
 # NextJS Smartcontract Lottery (Raffle) FCC
 
+![App](img/readme-app.png)
+
+[Example App here!](https://small-math-2959.on.fleek.co/)
+
 Built with ❤️ using:
 NextJS
 Solidity
