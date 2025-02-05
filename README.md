@@ -70,7 +70,7 @@ To have VSCode extension prettier auto-format `.jsx` and `.tsx`, add the followi
 
 ```
 git clone 
-cd hardhat-fund-me-fcc
+cd
 yarn 
 yarn hardhat node
 ```
